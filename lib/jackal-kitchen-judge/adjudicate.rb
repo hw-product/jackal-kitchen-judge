@@ -32,6 +32,8 @@ module Jackal
       # Return true if tests passed
       def adjudicate(payload)
         teapot_data = teapot_metadata(payload.get(:data, :kitchen, :test_output, :teapot))
+        chefspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :chefspec), :chefspec)
+        serverspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :serverspec), :serverspec)
         payload[:data][:kitchen][:judge][:teapot] = teapot_data
 
         judgement = { :reasons => [] }
@@ -75,16 +77,18 @@ module Jackal
           :total_runtime => total_runtime }
       end
 
-      def serverspec_metadata(data)
-        #total serverspec run time
-        #serverspec tests over threshold
-        #longest serverspec test
-      end
-
-      def chefspec_metadata(data)
-        #total chefspec run time
-        #longest chefspec test
-        #chefspec tests over threshold
+      def spec_metadata(data, format)
+        duration = data["summary"]["duration"]
+        sorted_tests = data["examples"].sort_by{ |x|x["run_time"] }
+        slowest_test = sorted_resources.last
+        tests_over_threshold = sorted_tests.reject { |e|
+          e["run_time"] < Carnivore::Config.get(
+            :kitchen, :thresholds, format, :test_runtime
+          )
+        }
+        { :slowest_test => slowest_test,
+          :tests_over_threshold => tests_over_threshold,
+          :total_runtime => duration }
       end
 
     end
