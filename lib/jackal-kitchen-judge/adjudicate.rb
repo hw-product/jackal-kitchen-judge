@@ -56,8 +56,8 @@ module Jackal
 
         duration = data["timing"].map { |d|d["time"] }.inject(:+)
 
-        exceeded = duration > Carnivore::Config.get(
-                     :kitchen, :thresholds, :teapot, :total_runtime
+        exceeded = duration > config.fetch(
+                     :kitchen, :thresholds, :teapot, :total_runtime, 600
                    )
 
         total_runtime = { :duration => duration,
@@ -67,8 +67,8 @@ module Jackal
         slowest_resource = sorted_resources.last
 
         resources_over_threshold = sorted_resources.reject { |r|
-          r["time"] < Carnivore::Config.get(
-            :kitchen, :thresholds, :teapot, :resource_runtime
+          r["time"] < config.fetch(
+            :kitchen, :thresholds, :teapot, :resource_runtime, 120
           )
         }
 
