@@ -80,12 +80,16 @@ module Jackal
       def spec_metadata(data, format)
         duration = data["summary"]["duration"]
         sorted_tests = data["examples"].sort_by{ |x|x["run_time"] }
-        slowest_test = sorted_resources.last
-        tests_over_threshold = sorted_tests.reject { |e|
-          e["run_time"] < Carnivore::Config.get(
-            :kitchen, :thresholds, format, :test_runtime
-          )
+        slowest_test = sorted_tests.last
+        tests_over_threshold = []
+        threshold = config.fetch(:kitchen, :thresholds, format, :test_runtime, 60)
+
+        tests_over_threshold = data["examples"].reject { |e|
+          if e.key?("run_time")
+            e["run_time"] < threshold
+          end
         }
+
         { :slowest_test => slowest_test,
           :tests_over_threshold => tests_over_threshold,
           :total_runtime => duration }
