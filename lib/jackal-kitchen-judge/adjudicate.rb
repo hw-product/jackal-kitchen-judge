@@ -31,14 +31,24 @@ module Jackal
       # payload:: Payload
       # Return true if tests passed
       def adjudicate(payload)
-        teapot_data = teapot_metadata(payload.get(:data, :kitchen, :test_output, :teapot))
-        chefspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :chefspec), :chefspec)
-        serverspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :serverspec), :serverspec)
-        payload[:data][:kitchen][:judge][:teapot] = teapot_data
+        # TODO make formats configurable
+        # e.g. formats = config.fetch(:kitchen, :config, :test_formats, %w(chefspec serverspec teapot))
+        %w(chefspec serverspec teapot).each do |f|
+          case f
+          when 'teapot'
+            @teapot_data = teapot_metadata(payload.get(:data, :kitchen, :test_output, :teapot))
+          when 'chefspec'
+            @chefspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :chefspec), :chefspec)
+          when 'serverspec'
+            @serverspec_data = spec_metadata(payload.get(:data, :kitchen, :test_output, :serverspec), :serverspec)
+          end
+        end
+
+        payload[:data][:kitchen][:judge][:teapot] = @teapot_data || Smash.new
 
         judgement = { :reasons => [] }
 
-        judgement[:reasons] << :teapot_runtime if teapot_data[:total_runtime][:threshold_exceeded]
+        judgement[:reasons] << :teapot_runtime if @teapot_data[:total_runtime][:threshold_exceeded]
 
         rspec_result = payload.get(:data, :kitchen, :result, "bundle exec rspec")
         kitchen_result = payload.get(:data, :kitchen, :result, "bundle exec kitchen test")
