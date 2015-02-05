@@ -43,8 +43,8 @@ module Jackal
         rspec_result = payload.get(:data, :kitchen, :result, "bundle exec rspec")
         kitchen_result = payload.get(:data, :kitchen, :result, "bundle exec kitchen test")
 
-        judgement[:reasons] << :rspec unless rspec_result == :success
-        judgement[:reasons] << :kitchen unless kitchen_result == :success
+        judgement[:reasons] << :rspec unless rspec_result.to_s == "success"
+        judgement[:reasons] << :kitchen unless kitchen_result.to_s == "success"
 
         judgement[:decision] = judgement[:reasons].empty?
 
