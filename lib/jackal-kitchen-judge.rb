@@ -1,5 +1,7 @@
 require 'jackal'
 require 'jackal-kitchen-judge/version'
+require 'jackal-kitchen-judge/formatter/slack_message'
+
 
 module Jackal
   module KitchenJudge
