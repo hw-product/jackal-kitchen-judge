@@ -15,7 +15,6 @@ module Jackal
         #
         # @param payload [Smash]
         def format(payload)
-          binding.pry
           ref = payload.get(:data, :github, :head_commit, :id)
           repo = payload.get(:data, :github, :repository, :full_name)
           success = payload.get(:data, :kitchen, :judge, :decision)
