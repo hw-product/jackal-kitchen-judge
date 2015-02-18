@@ -1,0 +1,1 @@
+Deprecated, see https://github.com/carnivore-rb/jackal-kitchen/blob/develop/lib/jackal-kitchen/formatter/adjudicate.rb
